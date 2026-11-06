@@ -17,18 +17,6 @@ var termModeType = map[string]string{
 	"4": "存量机具",
 }
 
-func GetInfo(ctx context.Context) (json.RawMessage, error) {
-	client, token, err := Login(ctx)
-	if err != nil {
-		return nil, err
-	}
-	result, err := client.GetInfo(ctx, token)
-	if err != nil {
-		return nil, errors.New("用户信息获取失败")
-	}
-	return result, nil
-}
-
 func BuildMachineExport(ctx context.Context, date string) ([]byte, error) {
 	client, token, err := Login(ctx)
 	if err != nil {

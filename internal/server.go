@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,7 +9,6 @@ import (
 func Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", health)
-	mux.HandleFunc("/api/info", getInfo)
 	mux.HandleFunc("/api/machine-export", machineExport)
 	return mux
 }
@@ -21,19 +19,6 @@ func health(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, _ = w.Write([]byte("ok"))
-}
-
-func getInfo(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		writeError(w, "请求方式错误")
-		return
-	}
-	result, err := GetInfo(r.Context())
-	if err != nil {
-		writeError(w, err.Error())
-		return
-	}
-	writeJSON(w, result)
 }
 
 func machineExport(w http.ResponseWriter, r *http.Request) {
@@ -58,11 +43,6 @@ func machineExport(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))
 	_, _ = w.Write(file)
-}
-
-func writeJSON(w http.ResponseWriter, value any) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	_ = json.NewEncoder(w).Encode(value)
 }
 
 func writeError(w http.ResponseWriter, message string) {

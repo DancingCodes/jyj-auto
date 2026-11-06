@@ -151,10 +151,6 @@ func (c *PCClient) ExchangeLoginToken(ctx context.Context, username, tk, cfk str
 	return tokenResponse.Data, nil
 }
 
-func (c *PCClient) GetInfo(ctx context.Context, token string) (json.RawMessage, error) {
-	return c.request(ctx, oagtoAPI+"/serv-api/getInfo", http.MethodGet, nil, token)
-}
-
 func (c *PCClient) GetMachineList(ctx context.Context, token, startTime, endTime string) (json.RawMessage, error) {
 	form := url.Values{
 		"startTime": {startTime},

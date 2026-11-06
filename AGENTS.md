@@ -2,7 +2,7 @@
 
 ## 项目用途
 
-这是一个 Go HTTP 服务，用于访问聚赢家 PC 端接口。目前已接入登录、获取用户信息和机具列表导出。
+这是一个 Go HTTP 服务，用于访问聚赢家 PC 端接口。目前已接入登录和机具列表导出。
 
 ## 目录结构
 
@@ -11,7 +11,7 @@ cmd/api/main.go       服务启动入口
 internal/pc.go        聚赢家 PC 上游接口客户端
 internal/ocr.go       Go 到内部 ddddocr 服务的调用
 internal/server.go    HTTP 路由
-internal/service.go   登录及用户信息流程编排
+internal/service.go   登录及机具导出流程编排
 internal/excel.go     机具列表 Excel 生成逻辑
 ../ddddocr/app.py     ddddocr 验证码识别服务
 config/accounts.json  本机运行配置（真实账号不提交）
@@ -26,7 +26,6 @@ config/accounts.json  本机运行配置（真实账号不提交）
 - `POST https://oagto.awillpay.com/serv-api/checkChannelFromKey`
 - `POST https://oagto.awillpay.com/serv-api/isLogin`
 - `POST https://oagto.awillpay.com/serv-api/loginAccount`
-- `GET https://oagto.awillpay.com/serv-api/getInfo`
 - `POST https://oagto.awillpay.com/serv-api/2.0/machine/getList`
 
 以上上游接口仅由内部客户端和服务流程调用，不单独暴露为本项目的 HTTP 路由。
@@ -43,7 +42,6 @@ go test ./...
 Go 服务固定连接 Docker 网络中的 OCR 服务 `http://ddddocr:9103`。因此运行 Go 服务时，`jyj-auto` 与 `ddddocr` 容器必须加入同一个 Docker 网络；该服务名不能在宿主机直接解析。
 
 - `GET /health`：健康检查
-- `GET /api/info`：读取配置中的 PC 账号，自动识别验证码、完成登录换票并获取用户信息
 - `GET /api/machine-export?date=YYYY-MM-DD`：自动登录后查询机具并导出 Excel；请求固定使用 `pageSize=999`、`pageNo=1`；`date` 可省略，默认查询昨天
 
 机具导出只在内存中生成 Excel 并直接返回 HTTP 响应，不在服务端落地文件。
