@@ -7,7 +7,6 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o jyj-auto ./cmd/api
 
 FROM alpine:latest
-RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /app/jyj-auto ./jyj-auto
 EXPOSE 9102

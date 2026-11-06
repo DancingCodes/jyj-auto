@@ -2,7 +2,7 @@
 
 ## 项目用途
 
-这是一个 Go HTTP 服务，用于访问聚赢家 PC 端接口。目前已接入登录前准备、登录和获取用户信息所需的上游接口；商户及交易查询接口将在拿到对应接口信息后接入。
+这是一个 Go HTTP 服务，用于访问聚赢家 PC 端接口。目前已接入登录、获取用户信息和机具列表导出。
 
 ## 目录结构
 
@@ -12,6 +12,7 @@ internal/pc.go        聚赢家 PC 上游接口客户端
 internal/ocr.go       Go 到内部 ddddocr 服务的调用
 internal/server.go    HTTP 路由
 internal/service.go   登录及用户信息流程编排
+internal/excel.go     机具列表 Excel 生成逻辑
 ../ddddocr/app.py     ddddocr 验证码识别服务
 config/accounts.json  本机运行配置（真实账号不提交）
 ```
@@ -26,6 +27,7 @@ config/accounts.json  本机运行配置（真实账号不提交）
 - `POST https://oagto.awillpay.com/serv-api/isLogin`
 - `POST https://oagto.awillpay.com/serv-api/loginAccount`
 - `GET https://oagto.awillpay.com/serv-api/getInfo`
+- `POST https://oagto.awillpay.com/serv-api/2.0/machine/getList`
 
 以上上游接口仅由内部客户端和服务流程调用，不单独暴露为本项目的 HTTP 路由。
 
@@ -38,15 +40,7 @@ go test ./...
 
 服务监听 `9102`。
 
-本地开发时需另启 OCR 服务：
-
-```bash
-cd ..\ddddocr
-pip install -r requirements.txt
-python app.py
-```
-
-Go 服务固定连接 Docker 网络中的 OCR 服务 `http://ddddocr:9103`。
+Go 服务固定连接 Docker 网络中的 OCR 服务 `http://ddddocr:9103`。因此运行 Go 服务时，`jyj-auto` 与 `ddddocr` 容器必须加入同一个 Docker 网络；该服务名不能在宿主机直接解析。
 
 - `GET /health`：健康检查
 - `GET /api/info`：读取配置中的 PC 账号，自动识别验证码、完成登录换票并获取用户信息
@@ -71,8 +65,10 @@ Go 服务固定连接 Docker 网络中的 OCR 服务 `http://ddddocr:9103`。
 docker build -t jyj-auto:latest .
 ```
 
-发布时 ddddocr 单独部署并加入与 jyj-auto 相同的 Docker 网络；jyj-auto 通过 `http://ddddocr:9103` 访问 OCR 服务，不在本 Compose 中重复启动 OCR：
+发布时 ddddocr 单独部署并加入与 jyj-auto 相同的 Docker 网络；jyj-auto 通过 `http://ddddocr:9103` 访问 OCR 服务，不在本 Compose 中重复启动 OCR。两个独立 Compose 文件都应声明同名网络，并将各自服务加入该网络：
 
 ```yaml
-docker compose up -d --build
+networks:
+  jyj-net:
+    name: jyj-net
 ```

@@ -207,5 +207,5 @@ func (c *PCClient) request(ctx context.Context, endpoint, method string, body io
 	if !json.Valid(responseBody) {
 		return nil, io.ErrUnexpectedEOF
 	}
-	return json.RawMessage(responseBody), nil
+	return responseBody, nil
 }
