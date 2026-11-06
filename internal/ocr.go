@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const ocrURL = "http://127.0.0.1:9103"
+const ocrURL = "http://ddddocr:9103"
 
 type ocrRequest struct {
 	Image string `json:"image"`
