@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -38,7 +38,7 @@ func RecognizeCaptcha(ctx context.Context, image string) (string, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("验证码识别服务调用失败")
+		return "", io.ErrUnexpectedEOF
 	}
 
 	var result ocrResponse
@@ -47,7 +47,7 @@ func RecognizeCaptcha(ctx context.Context, image string) (string, error) {
 	}
 	result.Text = strings.TrimSpace(result.Text)
 	if result.Text == "" {
-		return "", errors.New("验证码识别结果为空")
+		return "", io.ErrUnexpectedEOF
 	}
 	return result.Text, nil
 }

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
@@ -158,33 +157,10 @@ func (c *PCClient) GetInfo(ctx context.Context, token string) (json.RawMessage, 
 
 func (c *PCClient) GetMachineList(ctx context.Context, token, startTime, endTime string) (json.RawMessage, error) {
 	form := url.Values{
-		"goldPartner":      {""},
-		"isAgents":         {""},
-		"startSn":          {""},
-		"endSn":            {""},
-		"status":           {""},
-		"activeStatus":     {""},
-		"kfFlag":           {""},
-		"doneKfFlag":       {""},
-		"freezeFlag":       {""},
-		"startTime":        {startTime},
-		"endTime":          {endTime},
-		"pMobile":          {""},
-		"bSn":              {""},
-		"businessMen":      {""},
-		"pageSize":         {"999"},
-		"pageNo":           {"1"},
-		"projectType":      {""},
-		"selfMachine":      {""},
-		"createStartTime":  {""},
-		"createEndTime":    {""},
-		"selfMacStartTime": {""},
-		"selfMacEndTime":   {""},
-		"doneDbFlag":       {""},
-		"machineType":      {""},
-		"bindStatus":       {""},
-		"model":            {""},
-		"modelList":        {""},
+		"startTime": {startTime},
+		"endTime":   {endTime},
+		"pageSize":  {"999"},
+		"pageNo":    {"1"},
 	}
 	return c.request(ctx, machineListURL, http.MethodPost, strings.NewReader(form.Encode()), token)
 }
@@ -226,7 +202,7 @@ func (c *PCClient) request(ctx context.Context, endpoint, method string, body io
 		return nil, err
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("上游接口返回 HTTP %d", resp.StatusCode)
+		return nil, io.ErrUnexpectedEOF
 	}
 	if !json.Valid(responseBody) {
 		return nil, io.ErrUnexpectedEOF

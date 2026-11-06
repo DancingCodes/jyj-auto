@@ -46,7 +46,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Go 服务固定连接 OCR 服务 `http://127.0.0.1:9103`。
+Go 服务固定连接 Docker 网络中的 OCR 服务 `http://ddddocr:9103`。
 
 - `GET /health`：健康检查
 - `GET /api/info`：读取配置中的 PC 账号，自动识别验证码、完成登录换票并获取用户信息
@@ -71,7 +71,7 @@ Go 服务固定连接 OCR 服务 `http://127.0.0.1:9103`。
 docker build -t jyj-auto:latest .
 ```
 
-发布时 ddddocr 单独部署在服务器内部并监听 `127.0.0.1:9103`；jyj-auto 容器固定访问服务器内部的 OCR 服务，不在本 Compose 中重复启动 OCR：
+发布时 ddddocr 单独部署并加入与 jyj-auto 相同的 Docker 网络；jyj-auto 通过 `http://ddddocr:9103` 访问 OCR 服务，不在本 Compose 中重复启动 OCR：
 
 ```yaml
 docker compose up -d --build
