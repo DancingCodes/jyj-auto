@@ -1,0 +1,8 @@
+{
+  "pc": {
+    "username": "PC 登录账号",
+    "password": "PC 登录密码",
+    "channelCode": "432",
+    "cfk": "渠道识别 key"
+  }
+}
