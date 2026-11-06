@@ -42,20 +42,7 @@ func BuildMachineExcel(records []map[string]any) ([]byte, error) {
 	for row, record := range records {
 		values := make([]any, len(keys))
 		for column, key := range keys {
-			value := record[key]
-			if key == "termModeType" {
-				switch fmt.Sprint(value) {
-				case "1":
-					value = "购机"
-				case "2":
-					value = "赠机"
-				case "3":
-					value = "兑换机具"
-				case "4":
-					value = "存量机具"
-				}
-			}
-			values[column] = value
+			values[column] = record[key]
 		}
 		cell, err := excelize.CoordinatesToCellName(1, row+2)
 		if err != nil {

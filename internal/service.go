@@ -10,6 +10,13 @@ import (
 
 const maxLoginAttempts = 5
 
+var termModeType = map[string]string{
+	"1": "购机",
+	"2": "赠机",
+	"3": "兑换机具",
+	"4": "存量机具",
+}
+
 func GetInfo(ctx context.Context) (json.RawMessage, error) {
 	client, token, err := Login(ctx)
 	if err != nil {
@@ -33,8 +40,7 @@ func BuildMachineExport(ctx context.Context, date string) ([]byte, error) {
 	}
 	var response struct {
 		Data struct {
-			Total int                `json:"total"`
-			List  []map[string]any `json:"list"`
+			List []map[string]any `json:"list"`
 		} `json:"data"`
 	}
 	if err := json.Unmarshal(result, &response); err != nil {
@@ -44,14 +50,10 @@ func BuildMachineExport(ctx context.Context, date string) ([]byte, error) {
 	if records == nil {
 		records = []map[string]any{}
 	}
-	fmt.Printf("获取机具列表：接口总数 %d，当前列表 %d 条\n", response.Data.Total, len(records))
-	for index, record := range records {
-		data, marshalErr := json.Marshal(record)
-		if marshalErr != nil {
-			fmt.Printf("第 %d 条机具数据打印失败：%v\n", index+1, marshalErr)
-			continue
+	for _, record := range records {
+		if name := termModeType[fmt.Sprint(record["termModeType"])]; name != "" {
+			record["termModeType"] = name
 		}
-		fmt.Printf("第 %d 条机具数据：%s\n", index+1, data)
 	}
 	file, err := BuildMachineExcel(records)
 	if err != nil {
